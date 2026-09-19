@@ -1,0 +1,74 @@
+{
+  "Bacterial Spot": {
+    "symptoms": [
+      "Small dark water-soaked spots on leaves",
+      "Spots may enlarge and develop yellow halos",
+      "Fruit may develop raised dark lesions"
+    ],
+    "recommended_actions": [
+      "Remove and safely dispose of heavily infected leaves",
+      "Avoid overhead irrigation and prolonged leaf wetness",
+      "Improve air circulation between plants",
+      "Use locally approved disease-control products according to their labels"
+    ],
+    "prevention": [
+      "Use disease-free seeds or seedlings",
+      "Avoid working with plants when foliage is wet",
+      "Sanitize gardening tools"
+    ]
+  },
+
+  "Early Blight": {
+    "symptoms": [
+      "Dark circular spots on older leaves",
+      "Concentric ring patterns may appear inside lesions",
+      "Lower leaves may yellow and fall prematurely"
+    ],
+    "recommended_actions": [
+      "Remove severely affected leaves",
+      "Keep foliage dry and improve air circulation",
+      "Avoid overhead irrigation",
+      "Use locally approved disease-control products according to their labels"
+    ],
+    "prevention": [
+      "Remove infected plant debris",
+      "Practice crop rotation",
+      "Maintain adequate spacing between plants"
+    ]
+  },
+
+  "Late Blight": {
+    "symptoms": [
+      "Large dark irregular lesions on leaves",
+      "Rapid browning or collapse of affected foliage",
+      "White growth may appear under humid conditions"
+    ],
+    "recommended_actions": [
+      "Remove severely infected plant material",
+      "Avoid overhead irrigation",
+      "Improve field ventilation",
+      "Use locally approved disease-control products according to their labels"
+    ],
+    "prevention": [
+      "Remove infected plant debris",
+      "Avoid prolonged leaf wetness",
+      "Monitor plants frequently during cool and humid conditions"
+    ]
+  },
+
+  "Healthy": {
+    "symptoms": [
+      "No major visible disease symptoms detected"
+    ],
+    "recommended_actions": [
+      "Continue regular crop monitoring",
+      "Maintain appropriate irrigation and nutrition",
+      "Monitor new leaves for changes"
+    ],
+    "prevention": [
+      "Maintain good field hygiene",
+      "Inspect plants regularly",
+      "Remove diseased plant material promptly if symptoms appear"
+    ]
+  }
+}
