@@ -1,0 +1,57 @@
+<<<<<<< HEAD
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+=======
+node_modules/
+dist/
+build/
+.cache/
+.env*
+.vite/
+vite.config.*.timestamp-*
+*.tsbuildinfo
+*-debug.log*
+logs/
+*.log
+.claude-replay.*
+.tmp-*
+/.figma/design-context/
+
+# Platform-managed agentplat state, not project source. In the
+# client-initiated single-repo workspace layout (make's `Path: "."` spec) the
+# repo root IS the workspace root, so these land inside this repo rather than
+# beside it.
+/.plugins/
+/.opencode-skills/
+>>>>>>> 71bb829e9ccf8253789cdc79434b0c715b791668
