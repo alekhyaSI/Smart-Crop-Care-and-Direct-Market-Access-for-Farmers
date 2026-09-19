@@ -36,6 +36,7 @@ export interface MarketPrice {
 
 export interface Buyer {
   id: number;
+  username?: string;
   name: string;
   businessName: string;
   location: string;
@@ -48,7 +49,10 @@ export interface Buyer {
 export interface Request {
   id: number;
   buyerId: number;
+  buyerUsername?: string;
   buyerName: string;
+  farmerUsername?: string;
+  farmerName?: string;
   crop: string;
   quantity: number;
   price: number;

@@ -25,6 +25,18 @@ interface StorageRequest {
   status: string;
 }
 
+interface BuyerRequirement {
+  id: number;
+  buyerUsername: string;
+  buyerName: string;
+  businessName: string;
+  crop: string;
+  quantity: number;
+  price: number;
+  location: string;
+  contact: string;
+}
+
 interface Props {
   requests: Request[];
   username: string;
@@ -43,8 +55,18 @@ export default function RequestsPage({
   const [storageError, setStorageError] =
     useState('');
 
+  const [buyerRequirements, setBuyerRequirements] =
+    useState<BuyerRequirement[]>([]);
+
+  const [loadingBuyerRequirements, setLoadingBuyerRequirements] =
+    useState(true);
+
+  const [buyerRequirementsError, setBuyerRequirementsError] =
+    useState('');
+
   useEffect(() => {
     loadStorageRequests();
+    loadBuyerRequirements();
   }, [username]);
 
   async function loadStorageRequests() {
@@ -75,6 +97,26 @@ export default function RequestsPage({
       );
     } finally {
       setLoadingStorageRequests(false);
+    }
+  }
+
+  async function loadBuyerRequirements() {
+    try {
+      setLoadingBuyerRequirements(true);
+      setBuyerRequirementsError('');
+
+      const response = await fetch('http://localhost:8080/requirements');
+
+      if (!response.ok) {
+        throw new Error('Unable to load buyer requirements');
+      }
+
+      const data = await response.json();
+      setBuyerRequirements(Array.isArray(data) ? data : []);
+    } catch {
+      setBuyerRequirementsError('Unable to load buyer requirements.');
+    } finally {
+      setLoadingBuyerRequirements(false);
     }
   }
 
@@ -128,6 +170,68 @@ export default function RequestsPage({
         <div className="flex items-center justify-between mb-4">
 
           <div>
+
+          <section className="mb-10">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold text-[#1A2E1A]">
+                  Buyer Requirements
+                </h2>
+                <p className="mt-1 text-sm text-[#7A8C7A]">
+                  Produce requirements posted by buyers
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={loadBuyerRequirements}
+                className="text-sm font-semibold text-[#2D6A4F] hover:underline"
+              >
+                ↻ Refresh
+              </button>
+            </div>
+
+            {loadingBuyerRequirements ? (
+              <Card className="p-8 text-center">
+                <p className="text-sm text-[#7A8C7A]">Loading buyer requirements...</p>
+              </Card>
+            ) : buyerRequirementsError ? (
+              <Card className="p-8 text-center">
+                <p className="mb-4 text-sm text-red-600">{buyerRequirementsError}</p>
+                <Btn onClick={loadBuyerRequirements} variant="outline">Try Again</Btn>
+              </Card>
+            ) : buyerRequirements.length === 0 ? (
+              <EmptyState icon="📋" message="No buyer requirements posted yet." />
+            ) : (
+              <div className="flex flex-col gap-4">
+                {buyerRequirements.map(requirement => (
+                  <Card key={requirement.id} className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-base font-bold text-[#1A2E1A]">
+                          {requirement.crop}
+                        </h3>
+                        <p className="mt-1 text-sm text-[#7A8C7A]">
+                          Buyer: {requirement.buyerName || requirement.buyerUsername}
+                        </p>
+                        {requirement.businessName && (
+                          <p className="text-sm text-[#7A8C7A]">{requirement.businessName}</p>
+                        )}
+                      </div>
+                      <span className="rounded-full bg-[#D8F3DC] px-3 py-1 text-xs font-semibold text-[#2D6A4F]">
+                        Buyer Requirement
+                      </span>
+                    </div>
+                    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      <RequirementValue label="Quantity" value={`${requirement.quantity} kg`} />
+                      <RequirementValue label="Offered Price" value={`₹${requirement.price}`} />
+                      <RequirementValue label="Location" value={requirement.location} />
+                      <RequirementValue label="Contact" value={requirement.contact || 'Not provided'} />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
             <h2 className="text-xl font-bold text-[#1A2E1A]">
               Selling Requests
             </h2>
@@ -413,5 +517,14 @@ export default function RequestsPage({
       </section>
 
     </main>
+  );
+}
+
+function RequirementValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-[#7A8C7A]">{label}</p>
+      <p className="font-semibold text-[#1A2E1A]">{value}</p>
+    </div>
   );
 }

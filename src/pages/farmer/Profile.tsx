@@ -1,12 +1,45 @@
+import { useState } from 'react';
+import { LANGUAGES, User } from '../../data';
+import { Btn, Input, Select } from '../../components/shared';
 import { useLanguage } from '../../i18n';
 
 interface Props {
-  user: any;
-  onUpdate: (u: any) => void;
+  user: User;
+  onUpdate: (u: User) => void;
 }
 
 export default function FarmerProfilePage({ user, onUpdate }: Props) {
   const { t } = useLanguage();
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [name, setName] = useState(user.name || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [location, setLocation] = useState(user.location || '');
+  const [cropsGrown, setCropsGrown] = useState(user.cropsGrown || '');
+  const [preferredLanguage, setPreferredLanguage] = useState(user.preferredLanguage);
+
+  function saveProfile() {
+    onUpdate({
+      ...user,
+      name,
+      phone,
+      location,
+      cropsGrown,
+      preferredLanguage,
+    });
+    setEditing(false);
+    setSaved(true);
+    window.setTimeout(() => setSaved(false), 2500);
+  }
+
+  function cancelEdit() {
+    setName(user.name || '');
+    setPhone(user.phone || '');
+    setLocation(user.location || '');
+    setCropsGrown(user.cropsGrown || '');
+    setPreferredLanguage(user.preferredLanguage);
+    setEditing(false);
+  }
 
   return (
     <main className="max-w-5xl mx-auto px-4 md:px-6 py-8">
@@ -16,14 +49,20 @@ export default function FarmerProfilePage({ user, onUpdate }: Props) {
           {t('account')}
         </p>
 
-        <h1 className="font-display text-3xl md:text-4xl font-semibold text-[#1A2E1A]">
-          FARMER PROFILE NEW
+          <h1 className="font-display text-3xl md:text-4xl font-semibold text-[#1A2E1A]">
+          {t('farmerProfile')}
         </h1>
 
         <p className="text-[#7A8C7A] mt-2">
           {t('manageFarmerProfile')}
         </p>
       </div>
+
+      {saved && (
+        <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          {t('profileSaved')}
+        </div>
+      )}
 
       <section className="overflow-hidden rounded-3xl border border-[#D4E6C3] bg-white shadow-sm">
 
@@ -55,17 +94,27 @@ export default function FarmerProfilePage({ user, onUpdate }: Props) {
 
             </div>
 
-            <button
-              type="button"
-              className="bg-[#2D6A4F] text-white px-5 py-3 rounded-xl"
-            >
-              {t('editProfile')}
-            </button>
+            {!editing && <Btn onClick={() => setEditing(true)}>{t('editProfile')}</Btn>}
 
           </div>
 
         </div>
 
+        {editing ? (
+          <div className="p-6 md:p-8">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <Input label={t('name')} value={name} onChange={setName} />
+              <Input label={t('phone')} value={phone} onChange={setPhone} type="tel" />
+              <Input label={t('location')} value={location} onChange={setLocation} />
+              <Select label={t('preferredLanguage')} value={preferredLanguage} onChange={value => setPreferredLanguage(value as User['preferredLanguage'])} options={LANGUAGES} />
+              <Input label={t('cropsGrown')} value={cropsGrown} onChange={setCropsGrown} />
+            </div>
+            <div className="mt-8 flex gap-3">
+              <Btn variant="outline" onClick={cancelEdit}>{t('cancel')}</Btn>
+              <Btn onClick={saveProfile}>{t('saveProfile')}</Btn>
+            </div>
+          </div>
+        ) : (
         <div className="p-6 md:p-8">
 
           <section>
@@ -173,6 +222,7 @@ export default function FarmerProfilePage({ user, onUpdate }: Props) {
           </section>
 
         </div>
+        )}
 
       </section>
 

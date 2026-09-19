@@ -5,8 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 
 import FarmerDashboard from './pages/farmer/Dashboard';
-import Diagnosis from './pages/farmer/Diagnosis';
-import Treatment from './pages/farmer/Treatment';
+import CropHealth from './pages/farmer/CropHealth';
 import Market from './pages/farmer/Market';
 import Buyers from './pages/farmer/Buyers';
 import BuyerDetail from './pages/farmer/BuyerDetail';
@@ -25,7 +24,8 @@ import StorageOwnerDashboard from './pages/storage_owner/Dashboard';
 import PublicHeader from './components/PublicHeader';
 import AppHeader from './components/AppHeader';
 
-import { User, CropDiagnosis } from './data';
+import { User } from './data';
+import { useLanguage } from './i18n';
 
 type Page =
   | 'home'
@@ -125,6 +125,8 @@ function getStoredUser(): User | null {
 }
 
 export default function App() {
+  const { setLanguage } = useLanguage();
+
   const [user, setUser] =
     useState<User | null>(
       getStoredUser
@@ -143,9 +145,6 @@ export default function App() {
 
   const [selectedBuyer, setSelectedBuyer] =
     useState<any>(null);
-
-  const [diagnosis, setDiagnosis] =
-    useState<CropDiagnosis | null>(null);
 
   const [requests, setRequests] =
     useState<any[]>([]);
@@ -186,6 +185,7 @@ export default function App() {
     };
 
     setUser(normalizedUser);
+    setLanguage(normalizedUser.preferredLanguage);
 
     localStorage.setItem(
       'kisansetu_user',
@@ -213,7 +213,7 @@ export default function App() {
   }
 
   function handleRegister() {
-    setPage('login');
+    setPage('register');
   }
 
   function handleLogout() {
@@ -223,7 +223,6 @@ export default function App() {
 
     setUser(null);
     setSelectedBuyer(null);
-    setDiagnosis(null);
     setRequests([]);
     setPage('home');
   }
@@ -239,13 +238,30 @@ export default function App() {
     setPage('buyer-detail');
   }
 
-  function addRequest(
+  async function addRequest(
     request: any
   ) {
-    setRequests(prev => [
-      ...prev,
-      request,
-    ]);
+    if (!user) {
+      throw new Error('You must be logged in to send a request.');
+    }
+
+    const response = await fetch('http://localhost:8080/selling-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...request,
+        buyerUsername: request.buyerUsername || '',
+        farmerUsername: user.username,
+        farmerName: user.name,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error((await response.text()) || 'Unable to send request.');
+    }
+
+    const savedRequest = await response.json();
+    setRequests(prev => [...prev, savedRequest]);
   }
 
   function updateRequestStatus(
@@ -400,26 +416,11 @@ export default function App() {
         )}
 
         {page === 'diagnosis' && (
-          <Diagnosis
-            onTreatment={nextDiagnosis => {
-              setDiagnosis(
-                nextDiagnosis
-              );
-              setPage('treatment');
-            }}
-          />
+          <CropHealth onMarket={() => setPage('market')} />
         )}
 
         {page === 'treatment' && (
-          <Treatment
-            diagnosis={diagnosis}
-            onMarket={() =>
-              setPage('market')
-            }
-            onDiagnosis={() =>
-              setPage('diagnosis')
-            }
-          />
+          <CropHealth onMarket={() => setPage('market')} />
         )}
 
         {page === 'market' && (
@@ -468,6 +469,7 @@ export default function App() {
             user={user}
             onUpdate={updatedUser => {
               setUser(updatedUser);
+              setLanguage(updatedUser.preferredLanguage);
 
               localStorage.setItem(
                 'kisansetu_user',
@@ -514,6 +516,7 @@ export default function App() {
             user={user}
             onUpdate={updatedUser => {
               setUser(updatedUser);
+              setLanguage(updatedUser.preferredLanguage);
 
               localStorage.setItem(
                 'kisansetu_user',

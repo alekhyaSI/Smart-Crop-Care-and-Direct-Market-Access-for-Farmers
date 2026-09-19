@@ -40,6 +40,9 @@ export default function FarmerRequestsPage({
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [sellingRequests, setSellingRequests] = useState<Request[]>([]);
+  const [sellingRequestsError, setSellingRequestsError] = useState('');
+  const [loadingSellingRequests, setLoadingSellingRequests] = useState(true);
 
   const loadRequirements = async () => {
     try {
@@ -64,7 +67,38 @@ export default function FarmerRequestsPage({
 
   useEffect(() => {
     loadRequirements();
-  }, []);
+    loadSellingRequests();
+  }, [user?.username]);
+
+  async function loadSellingRequests() {
+    if (!user?.username) return;
+
+    try {
+      setLoadingSellingRequests(true);
+      setSellingRequestsError('');
+      const response = await fetch(
+        `http://localhost:8080/selling-requests/buyer/${encodeURIComponent(user.username)}`
+      );
+      if (!response.ok) throw new Error('Failed to load selling requests');
+      const data = await response.json();
+      setSellingRequests(Array.isArray(data) ? data : []);
+    } catch {
+      setSellingRequestsError('Unable to load farmer requests');
+    } finally {
+      setLoadingSellingRequests(false);
+    }
+  }
+
+  async function updateSellingRequestStatus(id: number, status: 'Accepted' | 'Rejected') {
+    const response = await fetch(
+      `http://localhost:8080/selling-requests/${id}/status?status=${status}`,
+      { method: 'PUT' }
+    );
+    if (!response.ok) throw new Error('Unable to update request status');
+    const updated = await response.json();
+    setSellingRequests(current => current.map(request => request.id === id ? updated : request));
+    onUpdateStatus(id, status);
+  }
 
   return (
     <div className="space-y-8">
@@ -185,14 +219,18 @@ export default function FarmerRequestsPage({
           </p>
         </div>
 
-        {requests.length === 0 ? (
+        {loadingSellingRequests ? (
+          <div className="py-10 text-center text-gray-500">Loading farmer requests...</div>
+        ) : sellingRequestsError ? (
+          <div className="py-10 text-center"><p className="mb-4 text-red-600">{sellingRequestsError}</p><Btn onClick={loadSellingRequests}>Try Again</Btn></div>
+        ) : sellingRequests.length === 0 ? (
           <EmptyState
             icon="📋"
             message="No selling requests. There are no farmer selling requests at the moment."
           />
         ) : (
           <div className="space-y-4">
-            {requests.map((request) => (
+            {sellingRequests.map((request) => (
               <div
                 key={request.id}
                 className="border border-gray-200 rounded-2xl p-5"
@@ -204,6 +242,9 @@ export default function FarmerRequestsPage({
                     </h3>
 
                     <p className="text-sm text-gray-500">
+                      Farmer: {request.farmerName || request.farmerUsername || 'Unknown'}
+                    </p>
+                    <p className="text-sm text-gray-500">
                       Quantity: {request.quantity} kg
                     </p>
                   </div>
@@ -214,18 +255,14 @@ export default function FarmerRequestsPage({
                 {request.status === 'Pending' && (
                   <div className="flex gap-3 mt-5">
                     <Btn
-                      onClick={() =>
-                        onUpdateStatus(request.id, 'Accepted')
-                      }
+                      onClick={() => updateSellingRequestStatus(request.id, 'Accepted')}
                     >
                       Accept
                     </Btn>
 
                     <Btn
                       variant="danger"
-                      onClick={() =>
-                        onUpdateStatus(request.id, 'Rejected')
-                      }
+                      onClick={() => updateSellingRequestStatus(request.id, 'Rejected')}
                     >
                       Reject
                     </Btn>

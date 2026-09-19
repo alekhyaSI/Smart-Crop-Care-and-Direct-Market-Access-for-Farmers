@@ -28,10 +28,6 @@ export default function AppHeader({
       label: t('diagnosis'),
     },
     {
-      key: 'treatment',
-      label: t('treatment'),
-    },
-    {
       key: 'market',
       label: t('market'),
     },

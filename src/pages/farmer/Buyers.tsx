@@ -51,6 +51,7 @@ export default function BuyersPage({ onViewBuyer }: Props) {
 
       const convertedBuyers: Buyer[] = data.map((buyer) => ({
         id: buyer.id,
+        username: buyer.username,
         name: buyer.name || buyer.username,
         businessName: buyer.businessName || 'Buyer',
         crop: buyer.cropsRequired

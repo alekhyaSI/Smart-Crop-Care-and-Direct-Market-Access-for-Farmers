@@ -4,7 +4,7 @@ import { Btn, Input, Select, Card, PageTitle } from '../../components/shared';
 
 interface Props {
   buyer: Buyer | null;
-  onSendRequest: (req: Omit<Request, 'id' | 'date'>) => void;
+  onSendRequest: (req: Omit<Request, 'id' | 'date'>) => Promise<void>;
   onBack: () => void;
 }
 
@@ -20,6 +20,7 @@ export default function BuyerDetailPage({
   const [farmerLocation, setFarmerLocation] = useState('');
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
 
   if (!buyer) {
     return (
@@ -41,7 +42,7 @@ export default function BuyerDetailPage({
 
   const selectedBuyer = buyer;
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
 
     e.preventDefault();
 
@@ -49,18 +50,23 @@ export default function BuyerDetailPage({
       return;
     }
 
-    onSendRequest({
-      buyerId: selectedBuyer.id,
-      buyerName: selectedBuyer.name,
-      crop,
-      quantity: Number(quantity),
-      price: selectedBuyer.price,
-      location: farmerLocation,
-      message,
-      status: 'Pending',
-    });
-
-    setSent(true);
+    try {
+      setError('');
+      await onSendRequest({
+        buyerId: selectedBuyer.id,
+        buyerName: selectedBuyer.name,
+        buyerUsername: selectedBuyer.username,
+        crop,
+        quantity: Number(quantity),
+        price: selectedBuyer.price,
+        location: farmerLocation,
+        message,
+        status: 'Pending',
+      });
+      setSent(true);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to send request.');
+    }
   }
 
   if (sent) {
@@ -229,6 +235,8 @@ export default function BuyerDetailPage({
             onSubmit={submit}
             className="flex flex-col gap-4"
           >
+
+            {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
             <Select
               label="Crop"

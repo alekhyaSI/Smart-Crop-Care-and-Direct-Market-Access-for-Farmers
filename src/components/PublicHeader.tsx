@@ -1,4 +1,5 @@
 import { LanguageSelector, ConnectivityIndicator } from './shared';
+import { useLanguage } from '../i18n';
 
 type Page = 'home' | 'about' | 'login' | 'register';
 
@@ -10,6 +11,9 @@ interface Props {
 }
 
 export default function PublicHeader({ current, onNav, language, onLanguage }: Props) {
+  const context = useLanguage();
+  const selectedLanguage = context.language;
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[#D4E6C3] shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -34,7 +38,7 @@ export default function PublicHeader({ current, onNav, language, onLanguage }: P
 
         <div className="flex items-center gap-3">
           <ConnectivityIndicator />
-          <LanguageSelector value={language} onChange={onLanguage} compact />
+          <LanguageSelector value={selectedLanguage} onChange={value => context.setLanguage(value as typeof selectedLanguage)} compact />
           {/* Mobile nav */}
           <div className="flex md:hidden items-center gap-1">
             <button onClick={() => onNav('login')} className="px-3 py-1.5 text-sm font-600 text-[#2D6A4F] border border-[#2D6A4F] rounded-lg hover:bg-[#D8F3DC] cursor-pointer">
