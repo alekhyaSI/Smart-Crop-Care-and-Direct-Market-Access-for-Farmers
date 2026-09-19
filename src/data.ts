@@ -1,4 +1,9 @@
-export type Role = 'farmer' | 'buyer';
+export type Role = 'farmer' | 'buyer' | 'storage_owner';
+
+export type Language =
+  | 'English'
+  | 'Telugu'
+  | 'Hindi';
 
 export interface User {
   username: string;
@@ -7,11 +12,18 @@ export interface User {
   name: string;
   phone: string;
   location: string;
-  preferredLanguage: string;
+  preferredLanguage: Language;
   cropsGrown?: string;
   businessName?: string;
   buyerType?: string;
+  profileImage?: string;
 }
+
+export const LANGUAGES: Language[] = [
+  'English',
+  'Telugu',
+  'Hindi',
+];
 
 export interface MarketPrice {
   id: number;
@@ -218,10 +230,18 @@ export const CROP_DIAGNOSES: Record<string, CropDiagnosis> = {
   },
 };
 
-export const LANGUAGES = [
-  'English', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam',
-  'Marathi', 'Gujarati', 'Punjabi', 'Bengali', 'Odia', 'Assamese',
+export const CROPS = [
+  'Tomato',
+  'Rice',
+  'Chilli',
+  'Cotton',
+  'Potato',
 ];
 
-export const CROPS = ['Tomato', 'Rice', 'Chilli', 'Cotton', 'Potato'];
-export const LOCATIONS = ['Guntur', 'Vijayawada', 'Tenali', 'Ongole', 'All Locations'];
+export const LOCATIONS = [
+  'Guntur',
+  'Vijayawada',
+  'Tenali',
+  'Ongole',
+  'All Locations',
+];

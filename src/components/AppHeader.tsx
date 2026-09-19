@@ -1,88 +1,184 @@
 import { User } from '../data';
-import { LanguageSelector, ConnectivityIndicator } from './shared';
-
-type FarmerPage = 'farmer-dashboard' | 'diagnosis' | 'treatment' | 'market' | 'buyers' | 'buyer-detail' | 'storage' | 'logistics' | 'requests' | 'farmer-profile';
-type BuyerPage = 'buyer-dashboard' | 'buyer-profile' | 'requirements' | 'farmer-requests';
-type AppPage = FarmerPage | BuyerPage;
+import { useLanguage } from '../i18n';
 
 interface Props {
   user: User;
-  language: string;
-  onLanguage: (l: string) => void;
-  onNav: (p: AppPage) => void;
+  language?: string;
+  onLanguage?: (language: string) => void;
+  onNav: (page: string) => void;
   onLogout: () => void;
-  current: AppPage;
+  current: string;
 }
 
-export default function AppHeader({ user, language, onLanguage, onNav, onLogout, current }: Props) {
-  const farmerLinks: { page: FarmerPage; label: string; icon: string }[] = [
-    { page: 'farmer-dashboard', label: 'Dashboard', icon: '🏠' },
-    { page: 'diagnosis', label: 'Diagnosis', icon: '🔬' },
-    { page: 'market', label: 'Market', icon: '📊' },
-    { page: 'buyers', label: 'Buyers', icon: '🤝' },
-    { page: 'storage', label: 'Storage', icon: '🏪' },
-    { page: 'logistics', label: 'Transport', icon: '🚛' },
-    { page: 'requests', label: 'Requests', icon: '📋' },
-    { page: 'farmer-profile', label: 'Profile', icon: '👤' },
+export default function AppHeader({
+  user,
+  onNav,
+  onLogout,
+  current,
+}: Props) {
+  const { language, t } = useLanguage();
+
+  const farmerNav = [
+    {
+      key: 'farmer-dashboard',
+      label: t('dashboard'),
+    },
+    {
+      key: 'diagnosis',
+      label: t('diagnosis'),
+    },
+    {
+      key: 'treatment',
+      label: t('treatment'),
+    },
+    {
+      key: 'market',
+      label: t('market'),
+    },
+    {
+      key: 'buyers',
+      label: t('buyers'),
+    },
+    {
+      key: 'storage',
+      label: t('storage'),
+    },
+    {
+      key: 'logistics',
+      label: t('transport'),
+    },
+    {
+      key: 'requests',
+      label: t('requests'),
+    },
   ];
 
-  const buyerLinks: { page: BuyerPage; label: string; icon: string }[] = [
-    { page: 'buyer-dashboard', label: 'Dashboard', icon: '🏠' },
-    { page: 'requirements', label: 'Requirements', icon: '📝' },
-    { page: 'farmer-requests', label: 'Requests', icon: '📨' },
-    { page: 'buyer-profile', label: 'Profile', icon: '👤' },
+  const buyerNav = [
+    {
+      key: 'buyer-dashboard',
+      label: t('dashboard'),
+    },
+    {
+      key: 'requirements',
+      label: t('requirements'),
+    },
+    {
+      key: 'farmer-requests',
+      label: t('farmerRequests'),
+    },
   ];
 
-  const links = user.role === 'farmer' ? farmerLinks : buyerLinks;
+  const navItems =
+    user.role === 'farmer'
+      ? farmerNav
+      : buyerNav;
 
   return (
-    <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[#D4E6C3] shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 lg:px-6">
+
+        <button
+          onClick={() =>
+            onNav(
+              user.role === 'farmer'
+                ? 'farmer-dashboard'
+                : 'buyer-dashboard'
+            )
+          }
+          className="flex items-center gap-3"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-600 text-xl text-white shadow-sm">
+            🌱
+          </div>
+
+          <div className="text-left">
+            <div className="text-lg font-bold leading-tight text-slate-900">
+              {t('appName')}
+            </div>
+
+            <div className="text-xs text-slate-500">
+              {user.role === 'farmer'
+                ? t('farmer')
+                : t('buyer')}
+            </div>
+          </div>
+        </button>
+
+        <nav className="hidden items-center gap-1 xl:flex">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => onNav(item.key)}
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                current === item.key
+                  ? 'bg-green-100 text-green-700'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+
+          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 sm:flex">
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="text-xs font-medium text-slate-600">
+              {t('online')}
+            </span>
+          </div>
+
+          <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 md:block">
+            {language}
+          </div>
+
           <button
-            onClick={() => onNav(user.role === 'farmer' ? 'farmer-dashboard' : 'buyer-dashboard')}
-            className="flex items-center gap-2 cursor-pointer shrink-0"
+            onClick={() =>
+              onNav(
+                user.role === 'farmer'
+                  ? 'farmer-profile'
+                  : 'buyer-profile'
+              )
+            }
+            className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${
+              current === 'farmer-profile' ||
+              current === 'buyer-profile'
+                ? 'border-green-500 bg-green-50'
+                : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
+            }`}
+            title={t('profile')}
           >
-            <span className="text-2xl">🌱</span>
-            <span className="font-display text-xl text-[#2D6A4F]">KisanSetu</span>
+            👤
           </button>
 
-          <div className="flex items-center gap-3 ml-auto">
-            <ConnectivityIndicator />
-            <LanguageSelector value={language} onChange={onLanguage} compact />
-            <div className="hidden sm:flex items-center gap-2 text-sm text-[#3D5A3D] font-500">
-              <span>{user.role === 'farmer' ? '🌾' : '🛒'}</span>
-              <span>{user.username}</span>
-            </div>
-            <button
-              onClick={onLogout}
-              className="px-3 py-1.5 text-sm font-600 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 cursor-pointer"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+          <button
+            onClick={onLogout}
+            className="hidden rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 sm:block"
+          >
+            {t('logout')}
+          </button>
 
-      {/* Bottom nav on mobile / sidebar-like nav on desktop */}
-      <nav className="bg-[#FAFAF5] border-b border-[#D4E6C3]">
-        <div className="max-w-6xl mx-auto px-4 overflow-x-auto">
-          <div className="flex items-center gap-1 py-1.5">
-            {links.map(l => (
-              <button
-                key={l.page}
-                onClick={() => onNav(l.page as AppPage)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-500 whitespace-nowrap cursor-pointer transition-colors ${
-                  current === l.page ? 'bg-[#2D6A4F] text-white' : 'text-[#3D5A3D] hover:bg-[#D8F3DC]'
-                }`}
-              >
-                <span className="text-base">{l.icon}</span>
-                <span>{l.label}</span>
-              </button>
-            ))}
-          </div>
         </div>
-      </nav>
-    </>
+      </div>
+
+      <div className="border-t border-slate-100 xl:hidden">
+        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 lg:px-6">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => onNav(item.key)}
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition ${
+                current === item.key
+                  ? 'bg-green-100 text-green-700'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </header>
   );
 }

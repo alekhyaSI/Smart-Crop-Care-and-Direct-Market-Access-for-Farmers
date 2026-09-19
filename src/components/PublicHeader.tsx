@@ -3,8 +3,8 @@ import { LanguageSelector, ConnectivityIndicator } from './shared';
 type Page = 'home' | 'about' | 'login' | 'register';
 
 interface Props {
-  current: Page;
-  onNav: (p: Page) => void;
+  current: string;
+  onNav: (p: string) => void;
   language: string;
   onLanguage: (l: string) => void;
 }

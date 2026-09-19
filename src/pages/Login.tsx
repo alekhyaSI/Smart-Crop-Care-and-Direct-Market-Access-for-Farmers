@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Input, Btn } from '../components/shared';
-import { User, DEMO_USERS, DEMO_PASSWORDS } from '../data';
+import { User, Role } from '../data';
 
 interface Props {
   onLogin: (user: User) => void;
@@ -8,63 +8,209 @@ interface Props {
 }
 
 export default function Login({ onLogin, onRegister }: Props) {
-  const [username, setUsername] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+
     setError('');
-    const user = DEMO_USERS.find(u => u.username === username.trim());
-    if (!user || DEMO_PASSWORDS[username.trim()] !== password) {
-      setError('Invalid username or password. Try the demo accounts below.');
+
+    if (!usernameOrEmail.trim()) {
+      setError('Please enter your username or email.');
       return;
     }
-    onLogin(user);
+
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        'http://localhost:8080/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            usernameOrEmail: usernameOrEmail.trim(),
+            password,
+          }),
+        }
+      );
+
+      const responseText = await response.text();
+
+      if (!response.ok) {
+        setError(
+          responseText ||
+            'Invalid username/email or password.'
+        );
+        return;
+      }
+
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        setError(
+          'Invalid response received from the server.'
+        );
+        return;
+      }
+
+      let normalizedRole: Role = 'farmer';
+
+      if (
+        data.role === 'BUYER' ||
+        data.role === 'buyer'
+      ) {
+        normalizedRole = 'buyer';
+      } else if (
+        data.role === 'STORAGE_OWNER' ||
+        data.role === 'storage_owner'
+      ) {
+        normalizedRole = 'storage_owner';
+      } else {
+        normalizedRole = 'farmer';
+      }
+
+      let preferredLanguage:
+        | 'English'
+        | 'Telugu'
+        | 'Hindi' = 'English';
+
+      if (data.preferredLanguage === 'Telugu') {
+        preferredLanguage = 'Telugu';
+      } else if (
+        data.preferredLanguage === 'Hindi'
+      ) {
+        preferredLanguage = 'Hindi';
+      }
+
+      const user: User = {
+        username: data.username,
+        email: data.email,
+        role: normalizedRole,
+        name: data.name || data.username,
+        phone: data.phone || '',
+        location: data.location || '',
+        preferredLanguage,
+        cropsGrown: data.cropsGrown || '',
+        businessName: data.businessName || '',
+        buyerType: data.buyerType || '',
+      };
+
+      localStorage.setItem(
+        'kisansetu_user',
+        JSON.stringify(user)
+      );
+
+      localStorage.setItem(
+        'kisansetu_language',
+        preferredLanguage
+      );
+
+      onLogin(user);
+    } catch {
+      setError(
+        'Unable to connect to the server. Make sure the Spring Boot backend is running on port 8080.'
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-8">
-      <div className="bg-white rounded-2xl border border-[#D4E6C3] p-8 max-w-sm w-full shadow-sm">
-        <div className="text-center mb-6">
-          <span className="text-4xl">🌱</span>
-          <h1 className="font-display text-2xl text-[#1A2E1A] mt-2">Welcome Back</h1>
-          <p className="text-[#7A8C7A] text-sm mt-1">Login to your KisanSetu account</p>
-        </div>
 
-        {/* Demo accounts */}
-        <div className="bg-[#D8F3DC] rounded-xl p-3 mb-5 text-sm text-[#2D6A4F] flex flex-col gap-2">
-          <p className="font-600">Demo Accounts:</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => { setUsername('farmer'); setPassword('farmer123'); }}
-              className="flex-1 bg-white rounded-lg py-1.5 text-center text-xs font-600 border border-[#74C69D] hover:bg-[#D8F3DC] cursor-pointer"
-            >
-              🌾 Farmer
-            </button>
-            <button
-              onClick={() => { setUsername('buyer'); setPassword('buyer123'); }}
-              className="flex-1 bg-white rounded-lg py-1.5 text-center text-xs font-600 border border-[#74C69D] hover:bg-[#D8F3DC] cursor-pointer"
-            >
-              🛒 Buyer
-            </button>
+      <div className="bg-white rounded-2xl border border-[#D4E6C3] p-8 max-w-md w-full shadow-sm">
+
+        <div className="text-center mb-7">
+
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#EAF5E4] flex items-center justify-center text-4xl">
+            🌱
           </div>
+
+          <h1 className="font-display text-2xl text-[#1A2E1A] mt-4">
+            Welcome Back
+          </h1>
+
+          <p className="text-[#7A8C7A] text-sm mt-1">
+            Login to your KisanSetu account
+          </p>
+
         </div>
 
-        <form onSubmit={submit} className="flex flex-col gap-4">
-          <Input label="Username / Email" value={username} onChange={setUsername} placeholder="farmer or buyer" required />
-          <Input label="Password" value={password} onChange={setPassword} type="password" placeholder="Your password" required />
+        <form
+          onSubmit={submit}
+          className="flex flex-col gap-4"
+        >
 
-          {error && <p className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+          <Input
+            label="Username or Email"
+            value={usernameOrEmail}
+            onChange={setUsernameOrEmail}
+            placeholder="Enter username or email"
+            required
+          />
 
-          <Btn type="submit" className="w-full justify-center mt-2">Login</Btn>
+          <Input
+            label="Password"
+            value={password}
+            onChange={setPassword}
+            type="password"
+            placeholder="Enter your password"
+            required
+          />
+
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+              <p className="text-sm text-red-700">
+                {error}
+              </p>
+            </div>
+          )}
+
+          <Btn
+            type="submit"
+            className="w-full justify-center mt-2"
+            disabled={loading}
+          >
+            {loading
+              ? 'Logging in...'
+              : 'Login'}
+          </Btn>
+
         </form>
 
-        <p className="text-center text-sm text-[#7A8C7A] mt-5">
-          Don't have an account?{' '}
-          <button onClick={onRegister} className="text-[#2D6A4F] font-600 hover:underline cursor-pointer">Register</button>
-        </p>
+        <div className="mt-6 pt-5 border-t border-[#E7EEE2]">
+
+          <p className="text-center text-sm text-[#7A8C7A]">
+
+            Don't have an account?{' '}
+
+            <button
+              type="button"
+              onClick={onRegister}
+              className="text-[#2D6A4F] font-semibold hover:underline cursor-pointer"
+            >
+              Create Account
+            </button>
+
+          </p>
+
+        </div>
+
       </div>
+
     </div>
   );
 }
