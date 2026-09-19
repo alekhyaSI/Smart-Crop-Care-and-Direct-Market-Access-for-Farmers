@@ -1,0 +1,1 @@
+{"demo": true, "notice": "Demo/sample buyer data only.", "records": [{"id": "BUY001", "name": "Fresh Foods Buyer", "crop": "Tomato", "location": "Guntur", "required_quantity_kg": 500, "offered_price_per_kg": 30, "contact": "Demo contact"}]}

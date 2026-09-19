@@ -1,0 +1,1 @@
+{"demo": true, "notice": "Demo/sample storage data only.", "records": [{"id": "STO001", "name": "Guntur Cold Storage", "location": "Guntur", "crop": "Tomato", "capacity_kg": 5000, "available_capacity_kg": 1800, "price_per_kg": 2, "contact": "Demo contact"}]}

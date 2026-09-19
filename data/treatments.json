@@ -1,0 +1,34 @@
+{
+  "Bacterial Spot": {
+    "crop": "Tomato",
+    "disease": "Bacterial Spot",
+    "symptoms": "Small dark spots on leaves and fruit, sometimes surrounded by yellowing.",
+    "immediate_actions": ["Remove badly affected leaves and dispose of them away from the crop.", "Avoid working among wet plants to reduce spread."],
+    "prevention": ["Use clean seed and healthy seedlings.", "Water at soil level and provide good airflow.", "Rotate crops where practical."],
+    "warning": "Follow locally approved agricultural guidance and product labels. Ask a local agriculture officer before applying any treatment."
+  },
+  "Early Blight": {
+    "crop": "Tomato",
+    "disease": "Early Blight",
+    "symptoms": "Brown leaf spots with concentric rings, often beginning on older lower leaves.",
+    "immediate_actions": ["Remove affected lower leaves and clear fallen plant debris.", "Keep foliage dry and improve spacing or airflow."],
+    "prevention": ["Use mulch to reduce soil splash.", "Rotate away from tomato and potato crops.", "Water near the soil rather than over the leaves."],
+    "warning": "Follow locally approved agricultural guidance and product labels. Ask a local agriculture officer before applying any treatment."
+  },
+  "Late Blight": {
+    "crop": "Tomato",
+    "disease": "Late Blight",
+    "symptoms": "Water-soaked dark patches on leaves and stems that can expand quickly in cool, wet conditions.",
+    "immediate_actions": ["Isolate and remove severely affected plant material.", "Avoid overhead irrigation and inspect nearby plants frequently."],
+    "prevention": ["Improve ventilation and plant spacing.", "Remove volunteer tomato and potato plants.", "Use resistant varieties when available locally."],
+    "warning": "Late blight can spread rapidly. Follow locally approved agricultural guidance and product labels, and contact an agriculture officer promptly."
+  },
+  "Healthy": {
+    "crop": "Tomato",
+    "disease": "Healthy",
+    "symptoms": "No disease pattern was detected in the uploaded image.",
+    "immediate_actions": ["Continue regular crop scouting, especially on new leaves and fruit.", "Remove weeds and damaged plant material."],
+    "prevention": ["Water consistently at the soil level.", "Maintain airflow with suitable spacing and staking.", "Use clean tools and healthy planting material."],
+    "warning": "This is an image-based screening result, not a diagnostic certainty. Seek local expert advice if the plant changes."
+  }
+}

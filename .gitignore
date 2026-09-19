@@ -19,3 +19,13 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+/.plugins/
+/.opencode-skills/
+
+# Python / ML
+.venv/
+ml/.venv/
+__pycache__/
+*.pyc
+*.pth
+ml/dataset/
