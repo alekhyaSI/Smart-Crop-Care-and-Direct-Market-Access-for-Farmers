@@ -1,0 +1,10 @@
+{
+  "description": "Streamline your daily tasks with a user-friendly platform designed for individuals and teams to enhance productivity and collaboration.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
